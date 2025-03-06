@@ -7,10 +7,13 @@ namespace PersonalJournal
         static List<string> journalEntries = new List<string>();
         static void Main(string[] args)
         {
-            Console.WriteLine("WELCOME TO MY PERSONAL JOURNAL");
+
 
             while (true)
             {
+                Console.WriteLine("\nWELCOME TO MY PERSONAL JOURNAL");
+                Console.WriteLine("------------------------------");
+
                 string[] actions = { "[1] Add Entry", "[2] View Entries", "[3] Delete Entry", "[4] Exit" };
 
                 foreach (var action in actions)
@@ -18,11 +21,8 @@ namespace PersonalJournal
                     Console.WriteLine(action);
                 }
                 Console.Write("Enter Action: ");
+                int userAction = Convert.ToInt16(Console.ReadLine());
 
-                if (int.TryParse(Console.ReadLine(), out int userAction))
-                {
-
-    
                 switch (userAction)
                 {
                     case 1:
@@ -42,12 +42,7 @@ namespace PersonalJournal
                         break;
                 }
             }
-            else
-            {
-                Console.WriteLine("Invalid! Please enter a number.");
-            }
         }
-    }
 
         static void AddEntry()
         {
@@ -60,32 +55,38 @@ namespace PersonalJournal
         static void ViewEntries()
         {
             Console.WriteLine("\nYour Journal Entries:");
-            if (journalEntries.Count == 0)
+            int count = journalEntries.Count;
+
+            if (count == 0)
             {
-                Console.WriteLine("No entries yet.");
+                Console.WriteLine("No entries yet");
             }
-            else
+
+            for (int i = 0; i < count; i++)
             {
-                for (int i = 0; i < journalEntries.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. {journalEntries[i]}");
-                }
+                Console.WriteLine($"{i + 1}. {journalEntries[i]}");
             }
+
         }
 
         static void DeleteEntry()
         {
             ViewEntries();
             Console.Write("Enter the number of the entry to delete: ");
-            if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= journalEntries.Count)
+            string userInput = Console.ReadLine();
+            int index = 0;
+            bool validNumber = int.TryParse(userInput, out index);
+
+            while (!validNumber || index <= 0 || index > journalEntries.Count)
             {
-                journalEntries.RemoveAt(index - 1);
-                Console.WriteLine("Entry deleted successfully!");
+                Console.WriteLine("Invalid Input");
+                return;
+                userInput = Console.ReadLine();
+                validNumber = int.TryParse(userInput, out index);
             }
-            else
-            {
-                Console.WriteLine("Invalid!");
-            }
+            journalEntries.RemoveAt(index - 1);
+            Console.WriteLine("Enter Deleted Succesfully!");
+
         }
     }
 }
