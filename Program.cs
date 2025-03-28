@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Channels;
+using Journal_BusinessLogic;
 
 namespace PersonalJournal
 {
     internal class Program
     {
-        static List<string> journalEntries = new List<string>();
         static string[] actions = { "[1] Add Entry", "[2] View Entries", "[3] Delete Entry", "[4] Exit" };
 
         static void Main(string[] args)
@@ -43,16 +44,17 @@ namespace PersonalJournal
                     case 3:
                         DeleteEntry();
                         break;
+                    case 4:
+                        Console.WriteLine("Exiting... Goodbye!");
+                        break;
                     default:
-                        Console.WriteLine("Invalid input. Please enter between 1-4 only.");
+                        Console.WriteLine("Incorrect input. Please enter between 1-4 only.");
                         break;
                 }
 
                 DisplayActions();
                 userInput = GetUserInput();
             }
-
-            Console.WriteLine("Exiting... Goodbye!");
         }
 
         static void DisplayActions()
@@ -69,59 +71,108 @@ namespace PersonalJournal
         static int GetUserInput()
         {
             Console.Write("[User Input]: ");
-            int userInput = Convert.ToInt16(Console.ReadLine());
+            string input = Console.ReadLine();
 
-            return userInput;
+            if (IsValidNumber(input)) 
+            {
+                return Convert.ToInt16(input);
+            }
+            else
+            {
+                Console.WriteLine("Invalid Input.");
+                return 0;
+            }    
+        }
+
+        static bool IsValidNumber(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (!char.IsDigit(input[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         static void AddEntry()
         {
-            Console.Write("Enter date (YYYY-MM-DD): ");
+            Console.WriteLine("----------------");
+            Console.WriteLine("ADD JOURNAL ENTRY");
+
+            Console.Write("Enter Date (MM-DD-YYYY): ");
             string date = Console.ReadLine();
+
 
             Console.Write("Enter your journal entry: ");
             string text = Console.ReadLine();
 
-            journalEntries.Add($"{date} ----- {text}"); 
-            Console.WriteLine("Entry added!");
+            if (JournalFlow.AddEntry(date, text))
+            {
+                Console.WriteLine("Entry added successfully!");
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Both date and text are required.");
+            }
         }
 
         static void ViewEntries()
         {
-            if (journalEntries.Count == 0) 
+            var entries = JournalFlow.GetJournalEntries();
+
+            if (entries.Count == 0)
             {
                 Console.WriteLine("No entries found.");
                 return;
             }
 
             Console.WriteLine("\nJournal Entries:");
-            for (int i = 0; i < journalEntries.Count; i++) 
+            for (int i = 0; i < entries.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {journalEntries[i]}");
+                Console.WriteLine($"{i + 1}. {entries[i]}");
             }
         }
 
         static void DeleteEntry()
         {
-            if (journalEntries.Count == 0)
+            var entries = JournalFlow.GetJournalEntries();
+
+            if (entries.Count == 0)
             {
                 Console.WriteLine("No entries to delete.");
                 return;
             }
 
             ViewEntries();
-            Console.Write("\nEnter the entry number to delete: ");
 
+            Console.Write("\nEnter the entry number to delete: ");
             string input = Console.ReadLine();
 
-            if (!int.TryParse(input, out int index) || index < 1 || index > journalEntries.Count)
+            if (IsValidNumber(input))
             {
-                Console.WriteLine("Invalid entry number.");
-                return;
-            }
+                int index = Convert.ToInt32(input);
 
-            journalEntries.RemoveAt(index - 1);
-            Console.WriteLine("Entry deleted!");
+                if (JournalFlow.DeleteEntry(index))
+                {
+                    Console.WriteLine("Entry deleted successfully!");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid entry number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+            }
         }
     }
 }

@@ -7,4 +7,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Journal_BusinessDataLogic\**" />
+    <EmbeddedResource Remove="Journal_BusinessDataLogic\**" />
+    <None Remove="Journal_BusinessDataLogic\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Journal_BusinessDataLogic\Journal_BusinessDataLogic.csproj" />
+  </ItemGroup>
+
 </Project>
