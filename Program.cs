@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Channels;
-using Journal_BusinessLogic;
+using Journal_BusinessDataLogic;
 
 namespace PersonalJournal
 {
