@@ -8,8 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="JournalCommon\**" />
+    <Compile Remove="JournalDataManager\**" />
+    <Compile Remove="JournalTask\**" />
     <Compile Remove="Journal_BusinessDataLogic\**" />
+    <EmbeddedResource Remove="JournalCommon\**" />
+    <EmbeddedResource Remove="JournalDataManager\**" />
+    <EmbeddedResource Remove="JournalTask\**" />
     <EmbeddedResource Remove="Journal_BusinessDataLogic\**" />
+    <None Remove="JournalCommon\**" />
+    <None Remove="JournalDataManager\**" />
+    <None Remove="JournalTask\**" />
     <None Remove="Journal_BusinessDataLogic\**" />
   </ItemGroup>
 

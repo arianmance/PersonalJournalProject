@@ -1,37 +1,45 @@
 ﻿using System;
-using Journal_BusinessDataLogic;
+using System.Collections.Generic;
+using JournalTask;
 
 namespace PersonalJournal
 {
     internal class Program
     {
-        static string[] actions = { "[1] Add Entry", "[2] View Entries", "[3] Delete Entry", "[4] Exit" };
+        static string[] actions = { "[1] Add Entry", "[2] View Entries", "[3] Delete Entry", "[4] Update Entry", "[5] Search", "[6] Exit" };
+        static JournalTask.JournalTask journalTask = new JournalTask.JournalTask();
 
         static void Main(string[] args)
         {
-            const string correctPassword = "1127"; 
-            string userPassword;
-
             Console.WriteLine("WELCOME TO MY JOURNAL");
+            Console.WriteLine("---------------------");
 
+            bool isAuthenticated = false;
+
+            while (!isAuthenticated)
+            {
+                Console.Write("Enter Username: ");
+                string username = Console.ReadLine();
+
+                Console.Write("Enter Password: ");
+                string password = Console.ReadLine();
+
+                isAuthenticated = journalTask.Login(username, password);
+
+                if (!isAuthenticated)
+                {
+                    Console.WriteLine("Invalid username or password. Please try again.\n");
+                }
+            }
+
+            Console.WriteLine("\nLogin successful!\n");
+
+            int userInput;
             do
             {
-                Console.Write("Enter Password: ");
-                userPassword = Console.ReadLine();
+                DisplayActions();
+                userInput = GetUserInput();
 
-                if (userPassword != correctPassword)
-                {
-                    Console.WriteLine("Incorrect password. Please try again.\n");
-                }
-
-            } while (userPassword != correctPassword);
-
-
-            DisplayActions();
-            int userInput = GetUserInput();
-
-            while (userInput != 4)
-            {
                 switch (userInput)
                 {
                     case 1:
@@ -44,22 +52,26 @@ namespace PersonalJournal
                         DeleteEntry();
                         break;
                     case 4:
+                        UpdateEntry();
+                        break;
+                    case 5:
+                        SearchEntries();
+                        break;
+                    case 6:
                         Console.WriteLine("Exiting... Goodbye!");
                         break;
                     default:
-                        Console.WriteLine("Incorrect input. Please enter between 1-4 only.");
+                        Console.WriteLine("Invalid choice. Please enter a number between 1 and 6.");
                         break;
                 }
 
-                DisplayActions();
-                userInput = GetUserInput();
-            }
+            } while (userInput != 6);
         }
 
         static void DisplayActions()
         {
             Console.WriteLine("\nJOURNAL MENU");
-            Console.WriteLine("--------------------");
+            Console.WriteLine("----------------");
 
             foreach (var action in actions)
             {
@@ -69,71 +81,37 @@ namespace PersonalJournal
 
         static int GetUserInput()
         {
-            Console.Write("[User Input]: ");
+            Console.Write("\n[User Input]: ");
             string input = Console.ReadLine();
-
-            if (IsValidNumber(input)) 
-            {
-                return Convert.ToInt16(input);
-            }
-            else
-            {
-                Console.WriteLine("Invalid Input.");
-                return 0;
-            }    
-        }
-
-        static bool IsValidNumber(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return false;
-            }
-
-            for (int i = 0; i < input.Length; i++)
-            {
-                if (!char.IsDigit(input[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return int.TryParse(input, out int result) ? result : 0;
         }
 
         static void AddEntry()
         {
-            Console.WriteLine("----------------");
-            Console.WriteLine("ADD JOURNAL ENTRY");
-
-            Console.Write("Enter Date (MM-DD-YYYY): ");
-            string date = Console.ReadLine();
-
-
             Console.Write("Enter your journal entry: ");
-            string text = Console.ReadLine();
+            string entry = Console.ReadLine();
 
-            if (JournalFlow.AddEntry(date, text))
+            if (journalTask.AddEntry(entry))
             {
                 Console.WriteLine("Entry added successfully!");
             }
             else
             {
-                Console.WriteLine("Invalid input. Both date and text are required.");
+                Console.WriteLine("Failed to add entry. Text cannot be empty.");
             }
         }
 
         static void ViewEntries()
         {
-            var entries = JournalFlow.GetJournalEntries();
+            List<string> entries = journalTask.GetEntries();
 
             if (entries.Count == 0)
             {
-                Console.WriteLine("No entries found.");
+                Console.WriteLine("No journal entries found.");
                 return;
             }
 
-            Console.WriteLine("\nJournal Entries:");
+            Console.WriteLine("\nYour Journal Entries:\n");
             for (int i = 0; i < entries.Count; i++)
             {
                 Console.WriteLine($"{i + 1}. {entries[i]}");
@@ -142,24 +120,13 @@ namespace PersonalJournal
 
         static void DeleteEntry()
         {
-            var entries = JournalFlow.GetJournalEntries();
-
-            if (entries.Count == 0)
-            {
-                Console.WriteLine("No entries to delete.");
-                return;
-            }
-
             ViewEntries();
-
             Console.Write("\nEnter the entry number to delete: ");
             string input = Console.ReadLine();
 
-            if (IsValidNumber(input))
+            if (int.TryParse(input, out int index))
             {
-                int index = Convert.ToInt32(input);
-
-                if (JournalFlow.DeleteEntry(index))
+                if (journalTask.DeleteEntry(index))
                 {
                     Console.WriteLine("Entry deleted successfully!");
                 }
@@ -170,7 +137,54 @@ namespace PersonalJournal
             }
             else
             {
-                Console.WriteLine("Invalid input. Please enter a valid number.");
+                Console.WriteLine("Invalid input.");
+            }
+        }
+
+        static void UpdateEntry()
+        {
+            ViewEntries();
+            Console.Write("\nEnter the entry number to update: ");
+            string input = Console.ReadLine();
+
+            if (int.TryParse(input, out int index))
+            {
+                Console.Write("Enter new journal text: ");
+                string newText = Console.ReadLine();
+
+                if (journalTask.UpdateEntry(index, newText))
+                {
+                    Console.WriteLine("Entry updated successfully!");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to update. Make sure the entry number and text are valid.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
+        }
+
+        static void SearchEntries()
+        {
+            Console.Write("Enter a keyword or date to search: ");
+            string keyword = Console.ReadLine();
+
+            var results = journalTask.SearchEntries(keyword);
+
+            if (results.Count > 0)
+            {
+                Console.WriteLine("\nSearch Results:");
+                foreach (var match in results)
+                {
+                    Console.WriteLine(match);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No matching entries found.");
             }
         }
     }
