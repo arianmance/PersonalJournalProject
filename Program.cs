@@ -11,8 +11,8 @@ namespace PersonalJournal
 
         static void Main(string[] args)
         {
-            Console.WriteLine("WELCOME TO MY JOURNAL");
-            Console.WriteLine("---------------------");
+            Console.WriteLine("   J O U R N A L");
+            Console.WriteLine("--------------------");
 
             bool isAuthenticated = false;
 
