@@ -23,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="Journal_BusinessDataLogic\Journal_BusinessDataLogic.csproj" />
+    <ProjectReference Include="JournalCommon\Journal_Common.csproj" />
+    <ProjectReference Include="JournalDataManager\Journal_DataLogic.csproj" />
+    <ProjectReference Include="Journal_BusinessDataLogic\Journal_BusinessLogic.csproj" />
   </ItemGroup>
 
 </Project>

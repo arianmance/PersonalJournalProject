@@ -4,19 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Journal_BusinessDataLogic
+namespace Journal_Common
 {
-    public class PersonalAccount
+    public class User
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public List<string> JournalEntries { get; set; }
+        public List<JournalEntry> Entries { get; set; }
 
-        public PersonalAccount(string username, string password)
+        public User(string username, string password)
         {
             Username = username;
             Password = password;
-            JournalEntries = new List<string>();
+            Entries = new List<JournalEntry>();
         }
     }
 }

@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JournalTask
+namespace Journal_Common
 {
     public enum Actions
     {
-        AddEntry,
-        ViewEntries,
-        DeleteEntry,
-        UpdateEntry,
-        Search,
-        Exit,
+        AddEntry = 1,
+        ViewEntries = 2,
+        DeleteEntry = 3,
+        UpdateEntry = 4,
+        Search = 5,
+        Exit = 6
     }
 }

@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JournalCommon\JournalCommon.csproj" />
+    <ProjectReference Include="..\JournalCommon\Journal_Common.csproj" />
+    <ProjectReference Include="..\JournalDataManager\Journal_DataLogic.csproj" />
   </ItemGroup>
 
 </Project>

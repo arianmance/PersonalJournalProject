@@ -5,11 +5,11 @@ VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalJournal", "PersonalJournal.csproj", "{503F559E-941A-4711-867F-305AD00E3BF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Journal_BusinessDataLogic", "Journal_BusinessDataLogic\Journal_BusinessDataLogic.csproj", "{99A61D90-6A7B-4F22-883D-376C8E5AA5BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Journal_BusinessLogic", "Journal_BusinessDataLogic\Journal_BusinessLogic.csproj", "{99A61D90-6A7B-4F22-883D-376C8E5AA5BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JournalDataManager", "JournalDataManager\JournalDataManager.csproj", "{CF25CAC9-8845-4BE3-9CDA-5BD6C79EF478}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Journal_DataLogic", "JournalDataManager\Journal_DataLogic.csproj", "{CF25CAC9-8845-4BE3-9CDA-5BD6C79EF478}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JournalCommon", "JournalCommon\JournalCommon.csproj", "{402E79FD-90C3-49E1-BF86-45015A7603BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Journal_Common", "JournalCommon\Journal_Common.csproj", "{402E79FD-90C3-49E1-BF86-45015A7603BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
