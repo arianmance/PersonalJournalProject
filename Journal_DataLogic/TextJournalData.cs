@@ -1,117 +1,107 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Journal_Common;
 using System.IO;
+using System.Linq;
+using Journal_Common;
 
 namespace Journal_DataLogic
 {
     public class TextJournalData : IJournalData
     {
-        private readonly string filePath = "journal_entries.txt";
-        private List<User> users = new List<User>();
+        private readonly string path = "journalEntries.txt";
+        private readonly List<JournalEntry> entries = new();
+
+        private readonly Dictionary<string, string> accounts = new()
+        {
+            { "yanyan", "1111" },
+            { "shen", "2222" }
+        };
 
         public TextJournalData()
         {
-            LoadFromFile();
+            LoadEntries();
         }
 
-        private void LoadFromFile()
+        public List<JournalEntry> LoadEntries()
         {
-            if (!File.Exists(filePath))
-                return;
+            entries.Clear();
+            if (!File.Exists(path)) return entries;
 
-            var lines = File.ReadAllLines(filePath);
-            foreach (var line in lines)
+            foreach (var line in File.ReadAllLines(path))
             {
                 var parts = line.Split('|');
-                if (parts.Length == 4)
-                {
-                    string username = parts[0];
-                    string password = parts[1];
-                    bool parsed = DateTime.TryParse(parts[2], out DateTime createdAt);
-                    string content = parts[3];
-
-                    if (!parsed) continue;
-
-                    var user = users.FirstOrDefault(u => u.Username == username);
-                    if (user == null)
-                    {
-                        user = new User(username, password);
-                        users.Add(user);
-                    }
-
-                    user.Entries.Add(new JournalEntry(content) { CreatedAt = createdAt });
-                }
+                if (parts.Length == 2)
+                    entries.Add(new JournalEntry { Username = parts[0], Content = parts[1] });
             }
+
+            return entries;
         }
 
-        private void SaveToFile()
+        private void SaveEntries()
         {
-            try
+            File.WriteAllLines(path, entries.Select(e => $"{e.Username}|{e.Content}"));
+        }
+
+        public void AddEntry(JournalEntry entry)
+        {
+            LoadEntries();
+            entries.Add(entry);
+            SaveEntries();
+        }
+
+        public void UpdateEntry(int userIndex, JournalEntry entry)
+        {
+            LoadEntries();
+
+            var userEntries = entries
+                .Select((e, i) => new { Entry = e, Index = i })
+                .Where(x => x.Entry.Username == entry.Username)
+                .ToList();
+
+            if (userIndex >= 0 && userIndex < userEntries.Count)
             {
-                var lines = new List<string>();
-                foreach (var user in users)
-                {
-                    foreach (var entry in user.Entries)
-                    {
-                        lines.Add($"{user.Username}|{user.Password}|{entry.CreatedAt:O}|{entry.Content}");
-                    }
-                }
-                File.WriteAllLines(filePath, lines);
+                int actualIndex = userEntries[userIndex].Index;
+                entries[actualIndex] = entry;
+                SaveEntries();
             }
-            catch (IOException ex)
+        }
+
+        public void DeleteEntry(int index, string username)
+        {
+            LoadEntries();
+
+            var userEntries = entries.Where(e => e.Username == username).ToList();
+
+            if (index >= 0 && index < userEntries.Count)
             {
-                Console.WriteLine("Error saving file: " + ex.Message);
+                var entryToRemove = userEntries[index];
+                entries.Remove(entryToRemove);
+                SaveEntries();
             }
         }
 
-        public bool ValidateUser(string username, string password)
+
+        public List<JournalEntry> SearchEntry(string keyword)
         {
-            return users.Any(u => u.Username == username && u.Password == password);
+            LoadEntries();
+            return entries
+                .Where(e => e.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
 
-        public List<JournalEntry> GetEntries(string username)
+        public bool ValidateAccount(string username, string password)
         {
-            var user = users.FirstOrDefault(u => u.Username == username);
-            return user?.Entries ?? new List<JournalEntry>();
+            return accounts.ContainsKey(username) && accounts[username] == password;
         }
 
-        public void AddEntry(string username, JournalEntry entry)
+        public bool HasEntries()
         {
-            var user = users.FirstOrDefault(u => u.Username == username);
-            if (user != null)
-            {
-                user.Entries.Add(entry);
-                SaveToFile();
-            }
+            return entries.Any();
         }
 
-        public void DeleteEntry(string username, int index)
+        void IJournalData.SaveEntries(List<JournalEntry> unused)
         {
-            var user = users.FirstOrDefault(u => u.Username == username);
-            if (user != null && index >= 0 && index < user.Entries.Count)
-            {
-                user.Entries.RemoveAt(index);
-                SaveToFile();
-            }
-        }
-
-        public void UpdateEntry(string username, int index, string newContent)
-        {
-            var user = users.FirstOrDefault(u => u.Username == username);
-            if (user != null && index >= 0 && index < user.Entries.Count)
-            {
-                user.Entries[index].Content = newContent;
-                SaveToFile();
-            }
-        }
-
-        public List<JournalEntry> SearchEntries(string username, string keyword)
-        {
-            return GetEntries(username).Where(e => e.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+            SaveEntries();
         }
     }
 }

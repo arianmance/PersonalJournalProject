@@ -1,68 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Journal_Common;
+﻿using Journal_Common;
 using Journal_DataLogic;
+using System.Collections.Generic;
 
 namespace Journal_BusinessLogic
 {
-    public class JournalProcess 
+    public class JournalProcess
     {
-        private readonly IJournalData _data;
-        private string _currentUser;
-
-        public JournalProcess()
-        {
-            _data = new InMemoryJournalData(); 
-        }
-
-        public bool Login(string username, string password)
-        {
-            bool valid = _data.ValidateUser(username, password);
-            if (valid)
-                _currentUser = username;
-            return valid;
-        }
-
-        public bool AddEntry(string content)
-        {
-            if (string.IsNullOrWhiteSpace(content)) return false;
-            _data.AddEntry(_currentUser, new JournalEntry(content));
-            return true;
-        }
+        private List<string> journalEntries = new List<string>();
 
         public List<string> GetEntries()
         {
-            var entries = _data.GetEntries(_currentUser);
-            List<string> formatted = new();
-            foreach (var e in entries)
-                formatted.Add($"{e.CreatedAt:yyyy-MM-dd HH:mm:ss} - {e.Content}");
-            return formatted;
+            return journalEntries;
+        }
+
+        public bool HasEntries()
+        {
+            return journalEntries.Count > 0;
+        }
+
+        public void AddEntry(string entry)
+        {
+            if (!string.IsNullOrWhiteSpace(entry))
+            {
+                journalEntries.Add(entry);
+            }
         }
 
         public bool DeleteEntry(int index)
         {
-            var entries = _data.GetEntries(_currentUser);
-            if (index < 1 || index > entries.Count) return false;
-            _data.DeleteEntry(_currentUser, index - 1);
-            return true;
+            if (index >= 0 && index < journalEntries.Count)
+            {
+                journalEntries.RemoveAt(index);
+                return true;
+            }
+            return false;
         }
 
-        public bool UpdateEntry(int index, string newContent)
+        public bool UpdateEntry(int index, string newEntry)
         {
-            if (string.IsNullOrWhiteSpace(newContent)) return false;
-            var entries = _data.GetEntries(_currentUser);
-            if (index < 1 || index > entries.Count) return false;
-            _data.UpdateEntry(_currentUser, index - 1, newContent);
-            return true;
+            if (index >= 0 && index < journalEntries.Count)
+            {
+                journalEntries[index] = newEntry;
+                return true;
+            }
+            return false;
         }
 
-        public List<string> SearchEntries(string keyword)
+        public bool SearchEntry(string keyword)
         {
-            var matches = _data.SearchEntries(_currentUser, keyword);
-            return matches.Select(e => $"{e.CreatedAt:yyyy-MM-dd HH:mm:ss} - {e.Content}").ToList();
+            keyword = keyword.ToLower();
+            foreach (var entry in journalEntries)
+            {
+                if (entry.ToLower().Contains(keyword))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool ValidateAccount(string username, string password)
+        {
+            JournalData dataService = new JournalData();
+            return dataService.ValidateAccount(username, password);
         }
     }
 }

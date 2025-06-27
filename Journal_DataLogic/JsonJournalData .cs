@@ -1,42 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using Journal_Common;
 
 namespace Journal_DataLogic
 {
-    public class InMemoryJournalData : IJournalData
+    public class JsonJournalData : IJournalData
     {
+        private readonly string path = "journalEntries.json";
         private readonly List<JournalEntry> entries = new();
+
         private readonly Dictionary<string, string> accounts = new()
         {
             { "yanyan", "1111" },
             { "shen", "2222" }
         };
 
+        public JsonJournalData()
+        {
+            LoadEntries();
+        }
+
         public List<JournalEntry> LoadEntries()
         {
+            entries.Clear();
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    var json = File.ReadAllText(path);
+                    var list = JsonSerializer.Deserialize<List<JournalEntry>>(json);
+                    if (list != null) entries.AddRange(list);
+                }
+                catch
+                {
+                }
+            }
             return entries;
         }
 
-        public void SaveEntries(List<JournalEntry> unused)
-        { 
-        }
-
-        public bool HasEntries()
+        private void SaveEntries()
         {
-            return entries.Any();
+            var json = JsonSerializer.Serialize(entries, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(path, json);
         }
 
         public void AddEntry(JournalEntry entry)
         {
+            LoadEntries();
             entries.Add(entry);
+            SaveEntries();
         }
 
         public void UpdateEntry(int userIndex, JournalEntry updatedEntry)
         {
+            LoadEntries();
+
             var userEntries = entries
                 .Select((e, i) => new { Entry = e, Index = i })
                 .Where(x => x.Entry.Username == updatedEntry.Username)
@@ -46,22 +68,30 @@ namespace Journal_DataLogic
             {
                 int actualIndex = userEntries[userIndex].Index;
                 entries[actualIndex] = updatedEntry;
+                SaveEntries();
             }
         }
 
         public void DeleteEntry(int index, string username)
         {
-            var userEntries = entries.Where(e => e.Username == username).ToList();
+            LoadEntries();
+
+            var userEntries = entries
+                .Select((e, i) => new { Entry = e, Index = i })
+                .Where(x => x.Entry.Username == username)
+                .ToList();
 
             if (index >= 0 && index < userEntries.Count)
             {
-                var entryToRemove = userEntries[index];
-                entries.Remove(entryToRemove);
+                int actualIndex = userEntries[index].Index;
+                entries.RemoveAt(actualIndex);
+                SaveEntries();
             }
         }
 
         public List<JournalEntry> SearchEntry(string keyword)
         {
+            LoadEntries();
             return entries
                 .Where(e => e.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 .ToList();
@@ -72,8 +102,19 @@ namespace Journal_DataLogic
             return accounts.ContainsKey(username) && accounts[username] == password;
         }
 
+        public bool HasEntries()
+        {
+            return entries.Any();
+        }
+
+        void IJournalData.SaveEntries(List<JournalEntry> unused)
+        {
+            SaveEntries();
+        }
+
         public List<JournalEntry> GetEntriesByUser(string username)
         {
+            LoadEntries();
             return entries
                 .Where(e => e.Username == username)
                 .ToList();

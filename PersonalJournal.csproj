@@ -12,20 +12,33 @@
     <Compile Remove="JournalDataManager\**" />
     <Compile Remove="JournalTask\**" />
     <Compile Remove="Journal_BusinessDataLogic\**" />
+    <Compile Remove="Journal_BusinessLogic\**" />
+    <Compile Remove="Journal_Common\**" />
+    <Compile Remove="Journal_DataLogic\**" />
     <EmbeddedResource Remove="JournalCommon\**" />
     <EmbeddedResource Remove="JournalDataManager\**" />
     <EmbeddedResource Remove="JournalTask\**" />
     <EmbeddedResource Remove="Journal_BusinessDataLogic\**" />
+    <EmbeddedResource Remove="Journal_BusinessLogic\**" />
+    <EmbeddedResource Remove="Journal_Common\**" />
+    <EmbeddedResource Remove="Journal_DataLogic\**" />
     <None Remove="JournalCommon\**" />
     <None Remove="JournalDataManager\**" />
     <None Remove="JournalTask\**" />
     <None Remove="Journal_BusinessDataLogic\**" />
+    <None Remove="Journal_BusinessLogic\**" />
+    <None Remove="Journal_Common\**" />
+    <None Remove="Journal_DataLogic\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="JournalCommon\Journal_Common.csproj" />
-    <ProjectReference Include="JournalDataManager\Journal_DataLogic.csproj" />
-    <ProjectReference Include="Journal_BusinessDataLogic\Journal_BusinessLogic.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Journal_BusinessLogic\Journal_BusinessLogic.csproj" />
   </ItemGroup>
 
 </Project>

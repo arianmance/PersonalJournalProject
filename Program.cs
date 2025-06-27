@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Journal_BusinessLogic; 
-using Journal_Common;        
-using Journal_DataLogic;     
+using System.Linq;
+using Journal_BusinessLogic;
+using Journal_Common;
 
 namespace PersonalJournal
 {
     internal class Program
     {
-        static JournalProcess journalTask = new JournalProcess();
+        static JournalService journal = new JournalService();
+        static string currentUsername = "";
 
         static void Main(string[] args)
         {
@@ -17,219 +18,226 @@ namespace PersonalJournal
             Console.WriteLine("Keep your thoughts and memories safe.");
             Console.WriteLine("-----------------------------------------------------------");
 
-            bool isAuthenticated = false;
-
-            while (!isAuthenticated)
+            while (true)
             {
-                Console.Write("Enter Username: ");
-                string username = Console.ReadLine() ?? string.Empty;
+                Console.Write("\nEnter Username: ");
+                string username = Console.ReadLine();
 
                 Console.Write("Enter Password: ");
-                string password = Console.ReadLine() ?? string.Empty;
+                string password = Console.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 {
-                    Console.WriteLine("\nUsername and password cannot be empty. Please try again.\n");
+                    Console.WriteLine("Username and password cannot be empty. Please try again.");
                     continue;
                 }
 
-                isAuthenticated = journalTask.Login(username, password);
-
-                if (!isAuthenticated)
+                if (journal.Login(username, password))
                 {
-                    Console.WriteLine("\nInvalid credentials. Please try again.\n");
+                    currentUsername = username;
+                    Console.WriteLine($"\nWelcome, {currentUsername}! Login successful!");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid credentials. Please try again.");
                 }
             }
 
-            Console.WriteLine("\nLogin successful! Let's begin...\n");
-
             while (true)
             {
-                DisplayMenu();
-                string choice = Console.ReadLine() ?? string.Empty;
+                DisplayMainMenu();
+                string menu = Console.ReadLine();
 
-                switch (choice)
+                switch (menu)
                 {
                     case "1":
-                        AddEntry();
+                        CreateOrAddEntry();
                         break;
                     case "2":
-                        ViewEntries();
+                        RetrieveOrViewEntries();
                         break;
                     case "3":
-                        DeleteEntry();
+                        UpdateEntry();
                         break;
                     case "4":
-                        UpdateEntry();
+                        DeleteEntry();
                         break;
                     case "5":
                         SearchEntries();
                         break;
                     case "6":
-                        Console.WriteLine("\nThank you for journaling today. Stay reflective!");
+                        Console.WriteLine("Thank you for journaling. See you next time!");
                         return;
                     default:
-                        Console.WriteLine("Not a valid option! Please enter a number between 1 to 6.");
+                        Console.WriteLine("Not a valid option! Please enter a number between 1 to 6 only.");
                         break;
                 }
 
-                while (true)
-                {
-                    Console.WriteLine("\nWould you like to go back to the menu? (Yes/No):");
-                    string backToMenu = Console.ReadLine()?.Trim().ToLower() ?? "";
+                Console.WriteLine("\nDo you want to go back to the menu? Please type Yes or No:");
+                string backToMenu = Console.ReadLine().Trim().ToLower();
 
-                    if (backToMenu == "yes")
-                    {
-                        Console.Clear();
-                        break;
-                    }
-                    else if (backToMenu == "no")
-                    {
-                        Console.WriteLine("\nGoodbye! Keep writing your story.");
-                        return;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Please enter 'Yes' or 'No'.");
-                    }
+                if (backToMenu != "yes")
+                {
+                    Console.WriteLine("\nThank you! See you next time.");
+                    break;
                 }
             }
         }
 
-        static void DisplayMenu()
+        static void DisplayMainMenu()
         {
-            Console.WriteLine("-----------------------------------------------------------");
-            Console.WriteLine("Please select an action:");
+            Console.WriteLine("\nPlease choose from the following options:");
             Console.WriteLine("[1] Add New Entry");
             Console.WriteLine("[2] View All Entries");
-            Console.WriteLine("[3] Delete an Entry");
-            Console.WriteLine("[4] Update an Entry");
+            Console.WriteLine("[3] Update an Entry");
+            Console.WriteLine("[4] Delete an Entry");
             Console.WriteLine("[5] Search Entries");
             Console.WriteLine("[6] Exit");
-            Console.Write("Your choice: ");
         }
 
-        static void AddEntry()
+        static void CreateOrAddEntry()
         {
-            Console.WriteLine("-----------------------------------------------------------");
-            Console.Write("Write your journal entry here: ");
-            string entry = Console.ReadLine() ?? string.Empty;
+            var userEntries = journal.GetEntries()
+                .Where(e => e.Username.Equals(currentUsername, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            if (journalTask.AddEntry(entry))
+            Console.WriteLine(userEntries.Count == 0
+                ? "\nThis is your first entry! Please type your first journal note:"
+                : "\nAdd a new journal entry:");
+
+            string entry = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(entry))
             {
+                journal.AddEntry(new JournalEntry { Username = currentUsername, Content = entry });
                 Console.WriteLine("Entry added successfully!");
             }
             else
             {
-                Console.WriteLine("Failed to add entry. Please don't leave it empty.");
+                Console.WriteLine("No entry provided. Please try again.");
             }
         }
 
-        static void ViewEntries()
+        static void RetrieveOrViewEntries()
         {
-            Console.WriteLine("-----------------------------------------------------------");
-            Console.WriteLine("Here are your journal entries:");
+            var userEntries = journal.GetEntries()
+                .Where(e => e.Username.Equals(currentUsername, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            List<string> entries = journalTask.GetEntries();
-
-            if (entries.Count == 0)
+            if (userEntries.Count == 0)
             {
-                Console.WriteLine("You haven't added any entries yet.");
+                Console.WriteLine("\nNo entries to display. Why not create one?");
                 return;
             }
 
-            for (int i = 0; i < entries.Count; i++)
+            Console.WriteLine("\nYour Entries:");
+            for (int i = 0; i < userEntries.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {entries[i]}");
-            }
-        }
-
-        static void DeleteEntry()
-        {
-            List<string> entries = journalTask.GetEntries();
-
-            if (entries.Count == 0)
-            {
-                Console.WriteLine("You have no entries to delete.");
-                return;
-            }
-
-            ViewEntries();
-
-            Console.Write("\nEnter the entry number to delete: ");
-            string input = Console.ReadLine() ?? string.Empty;
-
-            if (int.TryParse(input, out int index))
-            {
-                if (journalTask.DeleteEntry(index))
-                {
-                    Console.WriteLine("Entry deleted successfully!");
-                }
-                else
-                {
-                    Console.WriteLine("Invalid entry number.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Please enter a valid number.");
+                Console.WriteLine($"{i + 1}. {userEntries[i].Content}");
             }
         }
 
         static void UpdateEntry()
         {
-            List<string> entries = journalTask.GetEntries();
+            var userEntries = journal.GetEntries()
+                .Where(e => e.Username.Equals(currentUsername, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            if (entries.Count == 0)
+            if (userEntries.Count == 0)
             {
-                Console.WriteLine("You have no entries to update.");
+                Console.WriteLine("\nNo entries to update.");
                 return;
             }
 
-            ViewEntries();
+            Console.WriteLine("\nYour Entries:");
+            for (int i = 0; i < userEntries.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {userEntries[i].Content}");
+            }
 
-            Console.Write("\nEnter the entry number to update: ");
-            string input = Console.ReadLine() ?? string.Empty;
-
-            if (int.TryParse(input, out int index))
+            Console.Write("Enter the number of the entry you want to update: ");
+            if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= userEntries.Count)
             {
                 Console.Write("Enter the new content: ");
-                string newText = Console.ReadLine() ?? string.Empty;
+                string newContent = Console.ReadLine();
 
-                if (journalTask.UpdateEntry(index, newText))
+                if (!string.IsNullOrWhiteSpace(newContent))
                 {
+                    journal.UpdateEntry(index - 1, new JournalEntry { Username = currentUsername, Content = newContent });
                     Console.WriteLine("Entry updated successfully!");
                 }
                 else
                 {
-                    Console.WriteLine("Update failed. Entry number may be invalid or text is empty.");
+                    Console.WriteLine("New content cannot be empty.");
                 }
             }
             else
             {
-                Console.WriteLine("Please enter a valid number.");
+                Console.WriteLine("Invalid entry number.");
+            }
+        }
+
+        static void DeleteEntry()
+        {
+            var userEntries = journal.GetEntries()
+                .Where(e => e.Username.Equals(currentUsername, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (userEntries.Count == 0)
+            {
+                Console.WriteLine("\nNo entries to delete.");
+                return;
+            }
+
+            Console.WriteLine("\nYour Entries:");
+            for (int i = 0; i < userEntries.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {userEntries[i].Content}");
+            }
+
+            Console.Write("Enter the number of the entry you want to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= userEntries.Count)
+            {
+                journal.DeleteEntry(index - 1, currentUsername);
+                Console.WriteLine("Entry deleted successfully!");
+            }
+            else
+            {
+                Console.WriteLine("Invalid entry number.");
             }
         }
 
         static void SearchEntries()
         {
-            Console.Write("Enter keyword to search: ");
-            string keyword = Console.ReadLine() ?? string.Empty;
+            var userEntries = journal.GetEntries()
+                .Where(e => e.Username.Equals(currentUsername, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            var results = journalTask.SearchEntries(keyword);
-
-            Console.WriteLine("-----------------------------------------------------------");
-            if (results.Count > 0)
+            if (userEntries.Count == 0)
             {
-                Console.WriteLine("Search Results:");
-                foreach (var result in results)
-                {
-                    Console.WriteLine(result);
-                }
+                Console.WriteLine("\nNo entries to search.");
+                return;
+            }
+
+            Console.Write("Enter keyword to search: ");
+            string keyword = Console.ReadLine();
+
+            var results = userEntries
+                .Where(e => e.Content.IndexOf(keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                .ToList();
+
+            if (results.Count == 0)
+            {
+                Console.WriteLine("No entries matched your search.");
             }
             else
             {
-                Console.WriteLine("No matching entries found.");
+                Console.WriteLine("\nSearch results:");
+                foreach (var entry in results)
+                {
+                    Console.WriteLine($"- {entry.Content}");
+                }
             }
         }
     }

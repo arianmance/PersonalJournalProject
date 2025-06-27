@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace Journal_Common
 {
-    public class User
+    public class JournalAccount
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public List<JournalEntry> Entries { get; set; }
 
-        public User(string username, string password)
+        public JournalAccount(string username, string password)
         {
             Username = username;
             Password = password;
-            Entries = new List<JournalEntry>();
         }
+
+        public JournalAccount() { }
     }
 }

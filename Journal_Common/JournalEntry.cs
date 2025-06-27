@@ -8,13 +8,7 @@ namespace Journal_Common
 {
     public class JournalEntry
     {
+        public string Username { get; set; }
         public string Content { get; set; }
-        public DateTime CreatedAt { get; set; }
-
-        public JournalEntry(string content)
-        {
-            Content = content;
-            CreatedAt = DateTime.Now;
-        }
     }
 }

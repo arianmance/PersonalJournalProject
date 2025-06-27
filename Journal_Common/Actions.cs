@@ -12,7 +12,7 @@ namespace Journal_Common
         ViewEntries = 2,
         DeleteEntry = 3,
         UpdateEntry = 4,
-        Search = 5,
+        SearchEntries = 5,
         Exit = 6
     }
 }

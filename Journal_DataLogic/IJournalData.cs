@@ -1,19 +1,21 @@
-﻿using Journal_Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Journal_Common;
 
 namespace Journal_DataLogic
 {
     public interface IJournalData
     {
-        bool ValidateUser(string username, string password);
-        List<JournalEntry> GetEntries(string username);
-        void AddEntry(string username, JournalEntry entry);
-        void DeleteEntry(string username, int index);
-        void UpdateEntry(string username, int index, string newContent);
-        List<JournalEntry> SearchEntries(string username, string keyword);
+        List<JournalEntry> LoadEntries();
+        void SaveEntries(List<JournalEntry> entries);
+        bool HasEntries();
+        void AddEntry(JournalEntry entry);
+        void UpdateEntry(int index, JournalEntry entry);
+        void DeleteEntry(int index, string username);
+        List<JournalEntry> SearchEntry(string keyword);
+        bool ValidateAccount(string username, string password);
     }
 }
