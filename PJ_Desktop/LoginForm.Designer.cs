@@ -130,6 +130,7 @@
             Controls.Add(lblTitle);
             Controls.Add(lblWelcome);
             Name = "LoginForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "JOURNAL";
             Load += LoginForm_Load;
             ResumeLayout(false);

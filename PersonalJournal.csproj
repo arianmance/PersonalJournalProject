@@ -15,6 +15,8 @@
     <Compile Remove="Journal_BusinessLogic\**" />
     <Compile Remove="Journal_Common\**" />
     <Compile Remove="Journal_DataLogic\**" />
+    <Compile Remove="PJ_API\**" />
+    <Compile Remove="PJ_Desktop\**" />
     <EmbeddedResource Remove="JournalCommon\**" />
     <EmbeddedResource Remove="JournalDataManager\**" />
     <EmbeddedResource Remove="JournalTask\**" />
@@ -22,6 +24,8 @@
     <EmbeddedResource Remove="Journal_BusinessLogic\**" />
     <EmbeddedResource Remove="Journal_Common\**" />
     <EmbeddedResource Remove="Journal_DataLogic\**" />
+    <EmbeddedResource Remove="PJ_API\**" />
+    <EmbeddedResource Remove="PJ_Desktop\**" />
     <None Remove="JournalCommon\**" />
     <None Remove="JournalDataManager\**" />
     <None Remove="JournalTask\**" />
@@ -29,6 +33,17 @@
     <None Remove="Journal_BusinessLogic\**" />
     <None Remove="Journal_Common\**" />
     <None Remove="Journal_DataLogic\**" />
+    <None Remove="PJ_API\**" />
+    <None Remove="PJ_Desktop\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="{215d64d2-031c-33c7-96e3-61794cd1ee61}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>4</VersionMinor>
+      <VersionMajor>2</VersionMajor>
+      <Guid>215d64d2-031c-33c7-96e3-61794cd1ee61</Guid>
+    </COMReference>
   </ItemGroup>
 
   <ItemGroup>

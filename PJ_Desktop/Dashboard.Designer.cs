@@ -1,4 +1,5 @@
-﻿namespace PJ_Desktop
+﻿
+namespace PJ_Desktop
 {
     partial class Dashboard
     {
@@ -36,6 +37,7 @@
             btnLogout = new Button();
             txtSearch = new TextBox();
             JournalEntry = new ListBox();
+            btnView = new Button();
             SuspendLayout();
             // 
             // lblGreet
@@ -66,7 +68,7 @@
             // 
             btnUpdate.BackColor = SystemColors.InactiveCaption;
             btnUpdate.Font = new Font("Sitka Text", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnUpdate.Location = new Point(112, 59);
+            btnUpdate.Location = new Point(184, 59);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(75, 29);
             btnUpdate.TabIndex = 2;
@@ -78,7 +80,7 @@
             // 
             btnDelete.BackColor = SystemColors.InactiveCaption;
             btnDelete.Font = new Font("Sitka Text", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnDelete.Location = new Point(204, 59);
+            btnDelete.Location = new Point(265, 59);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(75, 29);
             btnDelete.TabIndex = 3;
@@ -102,9 +104,9 @@
             // 
             btnLogout.BackColor = Color.IndianRed;
             btnLogout.Font = new Font("Sitka Text", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLogout.Location = new Point(385, 59);
+            btnLogout.Location = new Point(399, 59);
             btnLogout.Name = "btnLogout";
-            btnLogout.Size = new Size(75, 29);
+            btnLogout.Size = new Size(61, 29);
             btnLogout.TabIndex = 5;
             btnLogout.Text = "Logout";
             btnLogout.UseVisualStyleBackColor = false;
@@ -132,12 +134,25 @@
             JournalEntry.TabIndex = 7;
             JournalEntry.SelectedIndexChanged += JournalEntry_SelectedIndexChanged;
             // 
+            // btnView
+            // 
+            btnView.BackColor = SystemColors.InactiveCaption;
+            btnView.Font = new Font("Sitka Text", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnView.Location = new Point(103, 59);
+            btnView.Name = "btnView";
+            btnView.Size = new Size(75, 29);
+            btnView.TabIndex = 8;
+            btnView.Text = "VIEW";
+            btnView.UseVisualStyleBackColor = false;
+            btnView.Click += btnView_Click;
+            // 
             // Dashboard
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 255, 192);
             ClientSize = new Size(484, 361);
+            Controls.Add(btnView);
             Controls.Add(JournalEntry);
             Controls.Add(txtSearch);
             Controls.Add(btnLogout);
@@ -147,10 +162,16 @@
             Controls.Add(btnCreate);
             Controls.Add(lblGreet);
             Name = "Dashboard";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Dashboard";
             Load += Dashboard_Load;
             ResumeLayout(false);
             PerformLayout();
+        }
+
+        private void lblGreet_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -163,5 +184,6 @@
         private Button btnLogout;
         private TextBox txtSearch;
         private ListBox JournalEntry;
+        private Button btnView;
     }
 }
